@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useApplications } from '../hooks/useApplications.js'
+import { useTheme } from '../hooks/useTheme.js'
 import ApplicationTable from './ApplicationTable.jsx'
 import ApplicationForm from './ApplicationForm.jsx'
+import ThemeSwitcher from './ThemeSwitcher.jsx'
 
 const ETAT_COUNTS = [
   { label: 'Accepté', color: '#22c55e', glow: 'rgba(34,197,94,0.15)' },
@@ -14,6 +16,7 @@ const ETAT_COUNTS = [
 
 export default function Tracker() {
   const { applications, loading, error, addApplication, updateApplication, deleteApplication } = useApplications()
+  const { theme, setTheme } = useTheme()
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [search, setSearch] = useState('')
@@ -70,7 +73,7 @@ export default function Tracker() {
       {/* Header */}
       <header
         className="sticky top-0 z-30"
-        style={{ background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}
+        style={{ background: 'var(--header-bg)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -78,7 +81,7 @@ export default function Tracker() {
               className="flex items-center justify-center w-8 h-8 rounded-lg"
               style={{ background: 'var(--red-glow)', border: '1px solid rgba(220,38,38,0.3)' }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" strokeWidth="2" strokeLinecap="round">
                 <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
                 <path d="M6 12v5c3 3 9 3 12 0v-5"/>
               </svg>
@@ -92,6 +95,7 @@ export default function Tracker() {
             <span className="text-xs" style={{ color: 'var(--muted)' }}>
               {applications.length} candidature{applications.length !== 1 ? 's' : ''}
             </span>
+            <ThemeSwitcher theme={theme} setTheme={setTheme} />
             <button
               onClick={logout}
               className="text-xs px-3 py-1.5 rounded-lg transition-colors"
