@@ -1,46 +1,102 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '../lib/supabase.js'
 
-const STORAGE_KEY = 'masters_applications'
-
-function loadFromStorage() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
+// Map DB row (snake_case) → app object (camelCase)
+function toApp(row) {
+  return {
+    id: row.id,
+    uni: row.uni ?? '',
+    formation: row.formation ?? '',
+    ville: row.ville ?? '',
+    mail: row.mail ?? '',
+    etat: row.etat ?? 'En attente',
+    site: row.site ?? '',
+    deadline: row.deadline ?? '',
+    dateApplied: row.date_applied ?? '',
+    notes: row.notes ?? '',
+    createdAt: row.created_at,
   }
 }
 
-function saveToStorage(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+// Map app object → DB insert/update payload
+function toRow(app) {
+  return {
+    uni: app.uni || null,
+    formation: app.formation || null,
+    ville: app.ville || null,
+    mail: app.mail || null,
+    etat: app.etat || 'En attente',
+    site: app.site || null,
+    deadline: app.deadline || null,
+    date_applied: app.dateApplied || null,
+    notes: app.notes || null,
+  }
 }
 
 export function useApplications() {
-  const [applications, setApplications] = useState(loadFromStorage)
+  const [applications, setApplications] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const fetchAll = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    const { data, error } = await supabase
+      .from('applications')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (error) {
+      setError(error.message)
+    } else {
+      setApplications(data.map(toApp))
+    }
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
-    saveToStorage(applications)
-  }, [applications])
+    fetchAll()
+  }, [fetchAll])
 
-  function addApplication(app) {
-    const newApp = {
-      ...app,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
+  async function addApplication(app) {
+    const { data, error } = await supabase
+      .from('applications')
+      .insert([toRow(app)])
+      .select()
+      .single()
+    if (error) {
+      console.error('addApplication:', error.message)
+      return
     }
-    setApplications(prev => [newApp, ...prev])
-    return newApp
+    setApplications(prev => [toApp(data), ...prev])
   }
 
-  function updateApplication(id, updates) {
-    setApplications(prev =>
-      prev.map(app => (app.id === id ? { ...app, ...updates } : app))
-    )
+  async function updateApplication(id, updates) {
+    const current = applications.find(a => a.id === id)
+    const merged = { ...current, ...updates }
+    const { data, error } = await supabase
+      .from('applications')
+      .update(toRow(merged))
+      .eq('id', id)
+      .select()
+      .single()
+    if (error) {
+      console.error('updateApplication:', error.message)
+      return
+    }
+    setApplications(prev => prev.map(a => a.id === id ? toApp(data) : a))
   }
 
-  function deleteApplication(id) {
-    setApplications(prev => prev.filter(app => app.id !== id))
+  async function deleteApplication(id) {
+    const { error } = await supabase
+      .from('applications')
+      .delete()
+      .eq('id', id)
+    if (error) {
+      console.error('deleteApplication:', error.message)
+      return
+    }
+    setApplications(prev => prev.filter(a => a.id !== id))
   }
 
-  return { applications, addApplication, updateApplication, deleteApplication }
+  return { applications, loading, error, addApplication, updateApplication, deleteApplication }
 }
