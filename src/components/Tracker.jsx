@@ -2,19 +2,22 @@ import { useState } from 'react'
 import { useApplications } from '../hooks/useApplications.js'
 import ApplicationTable from './ApplicationTable.jsx'
 import ApplicationForm from './ApplicationForm.jsx'
+import ChecklistPanel from './ChecklistPanel.jsx'
 import ThemeSwitcher from './ThemeSwitcher.jsx'
 
 const ETAT_COUNTS = [
   { label: 'Accepté', color: '#22c55e', glow: 'rgba(34,197,94,0.15)' },
   { label: 'En attente', color: '#6b7280', glow: 'rgba(107,114,128,0.1)' },
   { label: 'Candidature envoyée', color: '#3b82f6', glow: 'rgba(59,130,246,0.15)' },
+  { label: 'Campus', color: '#f97316', glow: 'rgba(249,115,22,0.15)' },
   { label: 'Refusé', color: '#dc2626', glow: 'rgba(220,38,38,0.15)' },
 ]
 
 export default function Tracker({ theme, setTheme }) {
-  const { applications, loading, error, addApplication, updateApplication, deleteApplication } = useApplications()
+  const { applications, loading, error, addApplication, updateApplication, deleteApplication, updateChecklist } = useApplications()
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState(null)
+  const [checklistApp, setChecklistApp] = useState(null)
   const [search, setSearch] = useState('')
 
   function handleAdd() {
@@ -52,10 +55,12 @@ export default function Tracker({ theme, setTheme }) {
       })
     : applications
 
-  // Stats
+  // Stats — count how many formations include each status
   const statsByEtat = {}
   for (const app of applications) {
-    statsByEtat[app.etat] = (statsByEtat[app.etat] || 0) + 1
+    for (const s of (app.etat ?? [])) {
+      statsByEtat[s] = (statsByEtat[s] || 0) + 1
+    }
   }
 
   function logout() {
@@ -193,6 +198,7 @@ export default function Tracker({ theme, setTheme }) {
               applications={filtered}
               onEdit={handleEdit}
               onDelete={deleteApplication}
+              onChecklist={app => setChecklistApp(app)}
             />
             {search && filtered.length === 0 && (
               <p className="text-center text-sm py-4" style={{ color: 'var(--muted)' }}>
@@ -209,6 +215,15 @@ export default function Tracker({ theme, setTheme }) {
           initial={editing}
           onSave={handleSave}
           onClose={handleClose}
+        />
+      )}
+
+      {/* Checklist panel */}
+      {checklistApp && (
+        <ChecklistPanel
+          app={checklistApp}
+          onUpdate={(checklist) => updateChecklist(checklistApp.id, checklist)}
+          onClose={() => setChecklistApp(null)}
         />
       )}
     </div>

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 const ETAT_OPTIONS = [
   'En attente',
   'Candidature envoyée',
+  'Campus',
   'Accepté',
   'Refusé',
 ]
@@ -11,9 +12,8 @@ const EMPTY_FORM = {
   uni: '',
   formation: '',
   ville: '',
-  campus: '',
   mail: '',
-  etat: 'En attente',
+  etat: ['En attente'],
   site: '',
   dateApplied: '',
   notes: '',
@@ -40,7 +40,7 @@ export default function ApplicationForm({ initial, onSave, onClose }) {
     const newErrors = {}
     if (!form.uni.trim()) newErrors.uni = true
     if (!form.formation.trim()) newErrors.formation = true
-    if (!form.etat) newErrors.etat = true
+    if (!form.etat || form.etat.length === 0) newErrors.etat = true
     return newErrors
   }
 
@@ -138,16 +138,6 @@ export default function ApplicationForm({ initial, onSave, onClose }) {
             />
           </Field>
 
-          {/* Campus */}
-          <Field label="Campus">
-            <input
-              style={inputStyle(false)}
-              value={form.campus}
-              onChange={e => set('campus', e.target.value)}
-              placeholder="ex. Campus centre-ville"
-            />
-          </Field>
-
           {/* Email */}
           <Field label="Email de contact">
             <input
@@ -161,17 +151,41 @@ export default function ApplicationForm({ initial, onSave, onClose }) {
 
           {/* État */}
           <Field label="État *" error={errors.etat}>
-            <select
-              style={{ ...inputStyle(errors.etat), appearance: 'none', cursor: 'pointer' }}
-              value={form.etat}
-              onChange={e => set('etat', e.target.value)}
-            >
-              {ETAT_OPTIONS.map(opt => (
-                <option key={opt} value={opt} style={{ background: 'var(--card)' }}>
-                  {opt}
-                </option>
-              ))}
-            </select>
+            <div className="flex flex-wrap gap-2 pt-0.5">
+              {ETAT_OPTIONS.map(opt => {
+                const active = form.etat.includes(opt)
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      const next = active
+                        ? form.etat.filter(s => s !== opt)
+                        : [...form.etat, opt]
+                      set('etat', next)
+                    }}
+                    style={{
+                      padding: '5px 12px',
+                      borderRadius: '999px',
+                      fontSize: '12px',
+                      fontWeight: active ? '600' : '400',
+                      cursor: 'pointer',
+                      border: `1px solid ${active ? 'var(--red)' : 'var(--border)'}`,
+                      background: active ? 'var(--red-glow)' : 'var(--card)',
+                      color: active ? 'var(--red)' : 'var(--muted)',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {opt}
+                  </button>
+                )
+              })}
+            </div>
+            {errors.etat && (
+              <p style={{ color: 'var(--red)', fontSize: '12px', marginTop: '4px' }}>
+                Sélectionnez au moins un état
+              </p>
+            )}
           </Field>
 
           {/* Site */}

@@ -8,9 +8,9 @@ function toApp(row) {
     uni: row.uni ?? '',
     formation: row.formation ?? '',
     ville: row.ville ?? '',
-    campus: row.campus ?? '',
     mail: row.mail ?? '',
-    etat: row.etat ?? 'En attente',
+    etat: Array.isArray(row.etat) ? row.etat : [row.etat ?? 'En attente'],
+    checklist: row.checklist ?? [],
     site: row.site ?? '',
     dateApplied: row.date_applied ?? '',
     notes: row.notes ?? '',
@@ -24,9 +24,9 @@ function toRow(app) {
     uni: app.uni || null,
     formation: app.formation || null,
     ville: app.ville || null,
-    campus: app.campus || null,
     mail: app.mail || null,
-    etat: app.etat || 'En attente',
+    etat: app.etat.length > 0 ? app.etat : ['En attente'],
+    checklist: app.checklist ?? [],
     site: app.site || null,
     date_applied: app.dateApplied || null,
     notes: app.notes || null,
@@ -86,6 +86,20 @@ export function useApplications() {
     setApplications(prev => prev.map(a => a.id === id ? toApp(data) : a))
   }
 
+  async function updateChecklist(id, checklist) {
+    const { data, error } = await supabase
+      .from('applications')
+      .update({ checklist })
+      .eq('id', id)
+      .select()
+      .single()
+    if (error) {
+      console.error('updateChecklist:', error.message)
+      return
+    }
+    setApplications(prev => prev.map(a => a.id === id ? toApp(data) : a))
+  }
+
   async function deleteApplication(id) {
     const { error } = await supabase
       .from('applications')
@@ -98,5 +112,5 @@ export function useApplications() {
     setApplications(prev => prev.filter(a => a.id !== id))
   }
 
-  return { applications, loading, error, addApplication, updateApplication, deleteApplication }
+  return { applications, loading, error, addApplication, updateApplication, deleteApplication, updateChecklist }
 }

@@ -11,6 +11,12 @@ const STATUS_STYLES = {
     color: '#93c5fd',
     dot: '#3b82f6',
   },
+  'Campus': {
+    bg: 'rgba(249,115,22,0.12)',
+    border: 'rgba(249,115,22,0.35)',
+    color: '#fdba74',
+    dot: '#f97316',
+  },
   'Accepté': {
     bg: 'rgba(34,197,94,0.12)',
     border: 'rgba(34,197,94,0.35)',
