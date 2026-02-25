@@ -14,6 +14,7 @@ const EMPTY_FORM = {
   ville: '',
   mail: '',
   etat: ['En attente'],
+  checklist: [],
   site: '',
   dateApplied: '',
   notes: '',
