@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useApplications } from '../hooks/useApplications.js'
-import { useTheme } from '../hooks/useTheme.js'
 import ApplicationTable from './ApplicationTable.jsx'
 import ApplicationForm from './ApplicationForm.jsx'
 import ThemeSwitcher from './ThemeSwitcher.jsx'
@@ -14,9 +13,8 @@ const ETAT_COUNTS = [
   { label: "Liste d'attente", color: '#a855f7', glow: 'rgba(168,85,247,0.15)' },
 ]
 
-export default function Tracker() {
+export default function Tracker({ theme, setTheme }) {
   const { applications, loading, error, addApplication, updateApplication, deleteApplication } = useApplications()
-  const { theme, setTheme } = useTheme()
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [search, setSearch] = useState('')

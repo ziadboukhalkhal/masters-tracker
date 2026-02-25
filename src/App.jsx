@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import PasswordGate from './components/PasswordGate.jsx'
 import Tracker from './components/Tracker.jsx'
+import { useTheme } from './hooks/useTheme.js'
 
 export default function App() {
+  const { theme, setTheme } = useTheme()
   const [authed, setAuthed] = useState(false)
 
   useEffect(() => {
@@ -26,5 +28,5 @@ export default function App() {
     return <PasswordGate onAuth={handleAuth} />
   }
 
-  return <Tracker />
+  return <Tracker theme={theme} setTheme={setTheme} />
 }
