@@ -64,9 +64,6 @@ export default function Tracker({ theme, setTheme }) {
   // Formations with a checklist
   const appsWithChecklist = applications.filter(a => a.checklist?.length > 0)
 
-  // Procedure totals
-  const totalSteps = appsWithChecklist.reduce((acc, a) => acc + a.checklist.length, 0)
-  const doneSteps = appsWithChecklist.reduce((acc, a) => acc + a.checklist.filter(i => i.done).length, 0)
 
   function logout() {
     sessionStorage.removeItem('auth')
@@ -118,49 +115,18 @@ export default function Tracker({ theme, setTheme }) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
         {/* Stats row */}
         {applications.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
 
             {/* Total candidatures */}
             <div
               className="rounded-xl px-4 py-3"
-              style={{ background: 'var(--surface)', border: '1px solid var(--red-glow)'.replace('var(--red-glow)', 'rgba(220,38,38,0.25)') }}
+              style={{ background: 'var(--surface)', border: '1px solid rgba(220,38,38,0.25)' }}
             >
               <div className="text-2xl font-bold" style={{ color: 'var(--red)' }}>
                 {applications.length}
               </div>
               <div className="text-xs mt-0.5 leading-tight" style={{ color: 'var(--muted)' }}>
                 Total candidatures
-              </div>
-            </div>
-
-            {/* Procédures */}
-            <div
-              className="rounded-xl px-4 py-3"
-              style={{
-                background: 'var(--surface)',
-                border: `1px solid ${totalSteps > 0 ? 'rgba(34,197,94,0.3)' : 'var(--border)'}`,
-              }}
-            >
-              <div className="flex items-end gap-1.5">
-                <span className="text-2xl font-bold" style={{ color: totalSteps > 0 ? '#22c55e' : 'var(--muted)' }}>
-                  {doneSteps}
-                </span>
-                {totalSteps > 0 && (
-                  <span className="text-sm font-medium mb-0.5" style={{ color: 'var(--muted)' }}>
-                    / {totalSteps}
-                  </span>
-                )}
-              </div>
-              {totalSteps > 0 && (
-                <div className="mt-1.5 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{ width: `${Math.round((doneSteps / totalSteps) * 100)}%`, background: '#22c55e' }}
-                  />
-                </div>
-              )}
-              <div className="text-xs mt-1 leading-tight" style={{ color: 'var(--muted)' }}>
-                Procédures
               </div>
             </div>
 
