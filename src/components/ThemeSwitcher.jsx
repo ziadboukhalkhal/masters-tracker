@@ -1,7 +1,7 @@
 const THEMES = [
   { id: 'dark', color: '#dc2626', label: 'Sombre' },
   { id: 'light', color: '#2563eb', label: 'Clair' },
-  { id: 'slate', color: '#3b82f6', label: 'Slate' },
+  { id: 'slate', color: '#22c55e', label: 'Slate' },
 ]
 
 export default function ThemeSwitcher({ theme, setTheme }) {
