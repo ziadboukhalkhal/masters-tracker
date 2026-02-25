@@ -2,22 +2,20 @@ import { useState } from 'react'
 import { useApplications } from '../hooks/useApplications.js'
 import ApplicationTable from './ApplicationTable.jsx'
 import ApplicationForm from './ApplicationForm.jsx'
-import ChecklistPanel from './ChecklistPanel.jsx'
 import ThemeSwitcher from './ThemeSwitcher.jsx'
 
 const ETAT_COUNTS = [
   { label: 'Accepté', color: '#22c55e', glow: 'rgba(34,197,94,0.15)' },
   { label: 'En attente', color: '#6b7280', glow: 'rgba(107,114,128,0.1)' },
-  { label: 'Candidature envoyée', color: '#3b82f6', glow: 'rgba(59,130,246,0.15)' },
+  { label: 'Envoyée', color: '#3b82f6', glow: 'rgba(59,130,246,0.15)' },
   { label: 'Campus', color: '#f97316', glow: 'rgba(249,115,22,0.15)' },
   { label: 'Refusé', color: '#dc2626', glow: 'rgba(220,38,38,0.15)' },
 ]
 
 export default function Tracker({ theme, setTheme }) {
-  const { applications, loading, error, addApplication, updateApplication, deleteApplication, updateChecklist } = useApplications()
+  const { applications, loading, error, addApplication, updateApplication, deleteApplication } = useApplications()
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [checklistApp, setChecklistApp] = useState(null)
   const [search, setSearch] = useState('')
 
   function handleAdd() {
@@ -50,7 +48,7 @@ export default function Tracker({ theme, setTheme }) {
           app.uni?.toLowerCase().includes(q) ||
           app.formation?.toLowerCase().includes(q) ||
           app.ville?.toLowerCase().includes(q) ||
-          app.etat?.toLowerCase().includes(q)
+          (app.etat ?? []).some(s => s.toLowerCase().includes(q))
         )
       })
     : applications
@@ -62,6 +60,9 @@ export default function Tracker({ theme, setTheme }) {
       statsByEtat[s] = (statsByEtat[s] || 0) + 1
     }
   }
+
+  // Formations with a checklist
+  const appsWithChecklist = applications.filter(a => a.checklist?.length > 0)
 
   function logout() {
     sessionStorage.removeItem('auth')
@@ -137,6 +138,83 @@ export default function Tracker({ theme, setTheme }) {
           </div>
         )}
 
+        {/* Procedure cards */}
+        {appsWithChecklist.length > 0 && (
+          <div>
+            <p className="text-xs font-semibold tracking-wider mb-3" style={{ color: 'var(--muted)' }}>
+              PROCÉDURES EN COURS
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {appsWithChecklist.map(app => {
+                const done = app.checklist.filter(i => i.done).length
+                const total = app.checklist.length
+                const pct = Math.round((done / total) * 100)
+                const isComplete = done === total
+                return (
+                  <button
+                    key={app.id}
+                    onClick={() => handleEdit(app)}
+                    className="text-left rounded-2xl p-4 transition-all"
+                    style={{
+                      background: 'var(--surface)',
+                      border: `1px solid ${isComplete ? 'rgba(34,197,94,0.35)' : 'var(--border)'}`,
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = isComplete ? 'rgba(34,197,94,0.6)' : 'var(--red)'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = isComplete ? 'rgba(34,197,94,0.35)' : 'var(--border)'}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold truncate" style={{ color: 'var(--text)' }}>
+                          {app.formation || app.uni || '—'}
+                        </p>
+                        {app.formation && app.uni && (
+                          <p className="text-xs truncate mt-0.5" style={{ color: 'var(--muted)' }}>
+                            {app.uni}
+                          </p>
+                        )}
+                      </div>
+                      <span
+                        className="flex-shrink-0 text-xs font-bold tabular-nums"
+                        style={{ color: isComplete ? '#22c55e' : 'var(--red)' }}
+                      >
+                        {pct}%
+                      </span>
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: 'var(--border)' }}>
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${pct}%`,
+                          background: isComplete ? '#22c55e' : 'var(--red)',
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs" style={{ color: 'var(--muted)' }}>
+                        {done}/{total} étape{total !== 1 ? 's' : ''}
+                      </span>
+                      <div className="flex gap-1 flex-wrap justify-end">
+                        {(app.etat ?? []).map(s => (
+                          <span
+                            key={s}
+                            className="text-xs px-2 py-0.5 rounded-full"
+                            style={{ background: 'var(--card)', color: 'var(--muted)', border: '1px solid var(--border)' }}
+                          >
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Toolbar */}
         <div className="flex items-center gap-3">
           {/* Search */}
@@ -198,7 +276,6 @@ export default function Tracker({ theme, setTheme }) {
               applications={filtered}
               onEdit={handleEdit}
               onDelete={deleteApplication}
-              onChecklist={app => setChecklistApp(app)}
             />
             {search && filtered.length === 0 && (
               <p className="text-center text-sm py-4" style={{ color: 'var(--muted)' }}>
@@ -218,14 +295,6 @@ export default function Tracker({ theme, setTheme }) {
         />
       )}
 
-      {/* Checklist panel */}
-      {checklistApp && (
-        <ChecklistPanel
-          app={checklistApp}
-          onUpdate={(checklist) => updateChecklist(checklistApp.id, checklist)}
-          onClose={() => setChecklistApp(null)}
-        />
-      )}
     </div>
   )
 }

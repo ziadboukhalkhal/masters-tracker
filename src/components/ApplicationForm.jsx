@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 const ETAT_OPTIONS = [
   'En attente',
-  'Candidature envoyée',
+  'Envoyée',
   'Campus',
   'Accepté',
   'Refusé',
@@ -20,8 +20,9 @@ const EMPTY_FORM = {
 }
 
 export default function ApplicationForm({ initial, onSave, onClose }) {
-  const [form, setForm] = useState(initial ? { ...EMPTY_FORM, ...initial } : { ...EMPTY_FORM })
+  const [form, setForm] = useState(initial ? { ...EMPTY_FORM, ...initial, checklist: initial.checklist ?? [] } : { ...EMPTY_FORM })
   const [errors, setErrors] = useState({})
+  const [newStep, setNewStep] = useState('')
 
   useEffect(() => {
     function onKey(e) {
@@ -218,6 +219,103 @@ export default function ApplicationForm({ initial, onSave, onClose }) {
               placeholder="Informations supplémentaires..."
             />
           </Field>
+
+          {/* Procédure finale */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xs font-semibold tracking-wider" style={{ color: 'var(--muted)' }}>PROCÉDURE FINALE</span>
+              <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+              {form.checklist.length > 0 && (
+                <span className="text-xs tabular-nums" style={{ color: 'var(--muted)' }}>
+                  {form.checklist.filter(i => i.done).length}/{form.checklist.length}
+                </span>
+              )}
+            </div>
+
+            {form.checklist.length > 0 && (
+              <div className="mb-3 space-y-1.5">
+                {form.checklist.map(item => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg group"
+                    style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => set('checklist', form.checklist.map(i => i.id === item.id ? { ...i, done: !i.done } : i))}
+                      className="flex-shrink-0 w-4 h-4 rounded flex items-center justify-center transition-all"
+                      style={{
+                        border: `1.5px solid ${item.done ? 'var(--red)' : 'var(--border)'}`,
+                        background: item.done ? 'var(--red)' : 'transparent',
+                      }}
+                    >
+                      {item.done && (
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5">
+                          <path d="M20 6L9 17l-5-5"/>
+                        </svg>
+                      )}
+                    </button>
+                    <span
+                      className="flex-1 text-sm"
+                      style={{
+                        color: item.done ? 'var(--muted)' : 'var(--text)',
+                        textDecoration: item.done ? 'line-through' : 'none',
+                      }}
+                    >
+                      {item.text}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => set('checklist', form.checklist.filter(i => i.id !== item.id))}
+                      className="flex-shrink-0 opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center rounded transition-opacity"
+                      style={{ color: 'var(--muted)' }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--muted)'}
+                    >
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <input
+                value={newStep}
+                onChange={e => setNewStep(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    const text = newStep.trim()
+                    if (!text) return
+                    set('checklist', [...form.checklist, { id: crypto.randomUUID(), text, done: false }])
+                    setNewStep('')
+                  }
+                }}
+                placeholder="Ajouter une étape..."
+                style={{ ...inputStyle(false), flex: 1 }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const text = newStep.trim()
+                  if (!text) return
+                  set('checklist', [...form.checklist, { id: crypto.randomUUID(), text, done: false }])
+                  setNewStep('')
+                }}
+                className="flex items-center justify-center w-10 rounded-xl flex-shrink-0"
+                style={{ background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--muted)' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--red-glow)'; e.currentTarget.style.color = 'var(--red)'; e.currentTarget.style.borderColor = 'var(--red)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'var(--card)'; e.currentTarget.style.color = 'var(--muted)'; e.currentTarget.style.borderColor = 'var(--border)' }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+              </button>
+            </div>
+          </div>
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">

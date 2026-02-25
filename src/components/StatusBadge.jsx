@@ -5,7 +5,7 @@ const STATUS_STYLES = {
     color: '#9ca3af',
     dot: '#6b7280',
   },
-  'Candidature envoyée': {
+  'Envoyée': {
     bg: 'rgba(59,130,246,0.12)',
     border: 'rgba(59,130,246,0.35)',
     color: '#93c5fd',

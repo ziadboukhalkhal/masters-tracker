@@ -9,7 +9,7 @@ function toApp(row) {
     formation: row.formation ?? '',
     ville: row.ville ?? '',
     mail: row.mail ?? '',
-    etat: Array.isArray(row.etat) ? row.etat : [row.etat ?? 'En attente'],
+    etat: Array.isArray(row.etat) ? row.etat.filter(Boolean) : [row.etat ?? 'En attente'],
     checklist: row.checklist ?? [],
     site: row.site ?? '',
     dateApplied: row.date_applied ?? '',
