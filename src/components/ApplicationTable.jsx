@@ -127,12 +127,12 @@ export default function ApplicationTable({ applications, onEdit, onDelete }) {
               <tr
                 key={app.id}
                 style={{
-                  background: idx % 2 === 0 ? 'var(--surface)' : '#111111',
+                  background: idx % 2 === 0 ? 'var(--surface)' : 'var(--row-alt)',
                   borderBottom: '1px solid var(--border)',
                   transition: 'background 0.1s',
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = 'var(--card)'}
-                onMouseLeave={e => e.currentTarget.style.background = idx % 2 === 0 ? 'var(--surface)' : '#111111'}
+                onMouseLeave={e => e.currentTarget.style.background = idx % 2 === 0 ? 'var(--surface)' : 'var(--row-alt)'}
               >
                 <td className="px-4 py-3">
                   <div>

@@ -159,7 +159,7 @@ export default function ApplicationForm({ initial, onSave, onClose }) {
               onChange={e => set('etat', e.target.value)}
             >
               {ETAT_OPTIONS.map(opt => (
-                <option key={opt} value={opt} style={{ background: '#1e1e1e' }}>
+                <option key={opt} value={opt} style={{ background: 'var(--card)' }}>
                   {opt}
                 </option>
               ))}
@@ -182,7 +182,7 @@ export default function ApplicationForm({ initial, onSave, onClose }) {
             <Field label="Deadline">
               <input
                 type="date"
-                style={{ ...inputStyle(false), colorScheme: 'dark' }}
+                style={{ ...inputStyle(false), colorScheme: 'inherit' }}
                 value={form.deadline}
                 onChange={e => set('deadline', e.target.value)}
               />
@@ -190,7 +190,7 @@ export default function ApplicationForm({ initial, onSave, onClose }) {
             <Field label="Date candidature">
               <input
                 type="date"
-                style={{ ...inputStyle(false), colorScheme: 'dark' }}
+                style={{ ...inputStyle(false), colorScheme: 'inherit' }}
                 value={form.dateApplied}
                 onChange={e => set('dateApplied', e.target.value)}
               />
