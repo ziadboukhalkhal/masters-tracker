@@ -5,8 +5,8 @@ const COLUMNS = [
   { key: 'uni', label: 'Université' },
   { key: 'formation', label: 'Formation' },
   { key: 'ville', label: 'Ville' },
+  { key: 'campus', label: 'Campus' },
   { key: 'etat', label: 'État' },
-  { key: 'deadline', label: 'Deadline' },
   { key: 'dateApplied', label: 'Candidature' },
 ]
 
@@ -157,17 +157,12 @@ export default function ApplicationTable({ applications, onEdit, onDelete }) {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <StatusBadge status={app.etat} />
+                  <span className="text-sm" style={{ color: 'var(--muted)' }}>
+                    {app.campus || '—'}
+                  </span>
                 </td>
                 <td className="px-4 py-3">
-                  <span
-                    className="text-sm"
-                    style={{
-                      color: app.deadline && new Date(app.deadline) < new Date() ? '#fca5a5' : 'var(--muted)',
-                    }}
-                  >
-                    {formatDate(app.deadline)}
-                  </span>
+                  <StatusBadge status={app.etat} />
                 </td>
                 <td className="px-4 py-3">
                   <span className="text-sm" style={{ color: 'var(--muted)' }}>

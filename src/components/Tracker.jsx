@@ -8,9 +8,7 @@ const ETAT_COUNTS = [
   { label: 'Accepté', color: '#22c55e', glow: 'rgba(34,197,94,0.15)' },
   { label: 'En attente', color: '#6b7280', glow: 'rgba(107,114,128,0.1)' },
   { label: 'Candidature envoyée', color: '#3b82f6', glow: 'rgba(59,130,246,0.15)' },
-  { label: 'Entretien', color: '#eab308', glow: 'rgba(234,179,8,0.15)' },
   { label: 'Refusé', color: '#dc2626', glow: 'rgba(220,38,38,0.15)' },
-  { label: "Liste d'attente", color: '#a855f7', glow: 'rgba(168,85,247,0.15)' },
 ]
 
 export default function Tracker({ theme, setTheme }) {

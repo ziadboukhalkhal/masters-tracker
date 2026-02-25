@@ -3,20 +3,18 @@ import { useState, useEffect } from 'react'
 const ETAT_OPTIONS = [
   'En attente',
   'Candidature envoyée',
-  'Entretien',
   'Accepté',
   'Refusé',
-  "Liste d'attente",
 ]
 
 const EMPTY_FORM = {
   uni: '',
   formation: '',
   ville: '',
+  campus: '',
   mail: '',
   etat: 'En attente',
   site: '',
-  deadline: '',
   dateApplied: '',
   notes: '',
 }
@@ -140,6 +138,16 @@ export default function ApplicationForm({ initial, onSave, onClose }) {
             />
           </Field>
 
+          {/* Campus */}
+          <Field label="Campus">
+            <input
+              style={inputStyle(false)}
+              value={form.campus}
+              onChange={e => set('campus', e.target.value)}
+              placeholder="ex. Campus centre-ville"
+            />
+          </Field>
+
           {/* Email */}
           <Field label="Email de contact">
             <input
@@ -177,25 +185,15 @@ export default function ApplicationForm({ initial, onSave, onClose }) {
             />
           </Field>
 
-          {/* Dates */}
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Deadline">
-              <input
-                type="date"
-                style={{ ...inputStyle(false), colorScheme: 'inherit' }}
-                value={form.deadline}
-                onChange={e => set('deadline', e.target.value)}
-              />
-            </Field>
-            <Field label="Date candidature">
-              <input
-                type="date"
-                style={{ ...inputStyle(false), colorScheme: 'inherit' }}
-                value={form.dateApplied}
-                onChange={e => set('dateApplied', e.target.value)}
-              />
-            </Field>
-          </div>
+          {/* Date candidature */}
+          <Field label="Date candidature">
+            <input
+              type="date"
+              style={{ ...inputStyle(false), colorScheme: 'inherit' }}
+              value={form.dateApplied}
+              onChange={e => set('dateApplied', e.target.value)}
+            />
+          </Field>
 
           {/* Notes */}
           <Field label="Notes">

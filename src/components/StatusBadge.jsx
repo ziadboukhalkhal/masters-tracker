@@ -11,12 +11,6 @@ const STATUS_STYLES = {
     color: '#93c5fd',
     dot: '#3b82f6',
   },
-  'Entretien': {
-    bg: 'rgba(234,179,8,0.12)',
-    border: 'rgba(234,179,8,0.35)',
-    color: '#fde047',
-    dot: '#eab308',
-  },
   'Accepté': {
     bg: 'rgba(34,197,94,0.12)',
     border: 'rgba(34,197,94,0.35)',
@@ -28,12 +22,6 @@ const STATUS_STYLES = {
     border: 'rgba(220,38,38,0.35)',
     color: '#fca5a5',
     dot: '#dc2626',
-  },
-  "Liste d'attente": {
-    bg: 'rgba(168,85,247,0.12)',
-    border: 'rgba(168,85,247,0.35)',
-    color: '#d8b4fe',
-    dot: '#a855f7',
   },
 }
 
